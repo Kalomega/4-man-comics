@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>4 man comics</title>
+<link href="https://fonts.googleapis.com/css2?family=Caveat+Brush&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#1d1d24;--mute:#6b6b78;--soft:#f6f4ee;--acc:#ff5a3c;--acc2:#2f6bff;--yel:#ffd84d;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}html{color-scheme:light}
+body{margin:0;color:var(--ink);font:16px/1.4 Nunito,system-ui,sans-serif;background-color:#fff;background-image:radial-gradient(#dcdad2 1px,transparent 1.3px);background-size:22px 22px}
+h1,h2,.mk{font-family:'Caveat Brush','Comic Sans MS',cursive;font-weight:400;margin:0}
+h1{font-size:clamp(56px,10vw,118px);line-height:.95;transform:rotate(-2deg)}
+.num{display:inline-block;min-width:46px;text-align:center;font-family:'Caveat Brush',cursive;font-size:30px;line-height:1.1;background:var(--yel);border:2.5px solid var(--ink);border-radius:6px;transform:rotate(-3deg);padding:0 8px;margin-left:6px}
+.pill{display:inline-block;border:2px solid var(--ink);border-radius:99px;padding:1px 12px;font-weight:800;font-size:14px;background:var(--yel)}
+h2{font-size:28px;line-height:1.1}
+p{margin:6px 0}
+.wob{border:2.5px solid var(--ink);border-radius:255px 14px 225px 14px/14px 225px 14px 255px;background:#fff}
+button{font:inherit;font-weight:700;color:var(--ink);cursor:pointer;background:#fff;border:2px solid var(--ink);border-radius:12px 8px 14px 8px;padding:7px 13px;touch-action:manipulation}
+button:hover{background:var(--soft)}button:focus-visible,input:focus-visible{outline:3px solid var(--acc2);outline-offset:2px}
+button.pri{background:var(--acc);color:#fff;box-shadow:3px 3px 0 var(--ink)}button.pri:hover{background:#ff7157}
+button.on{background:var(--yel);color:var(--ink);box-shadow:2px 2px 0 var(--ink)}
+.ib{width:40px;height:40px;padding:0;display:grid;place-items:center}.ib svg{width:23px;height:23px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.hide{display:none!important}.mute{color:var(--mute);font-size:14px}
+label{display:block;font-weight:800;margin:12px 0 5px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+input[type=text]{flex:1;min-width:0;padding:8px 11px;border:2px solid var(--ink);border-radius:10px;font:inherit;background:#fff;color:var(--ink)}
+input[type=range]{accent-color:var(--acc)}
+/* setup */
+.hero{max-width:1140px;margin:0 auto;padding:clamp(20px,7vh,80px) 20px 30px;display:flex;gap:clamp(24px,5vw,64px);align-items:flex-start;flex-wrap:wrap}
+.hl{flex:1 1 380px}.hl p{font-size:clamp(19px,2.4vw,26px);max-width:520px;margin:14px 0}
+.dd{display:grid;grid-template-columns:1fr 1fr;gap:16px;width:clamp(220px,32vw,360px);margin:26px 0 4px}
+.sq{aspect-ratio:1;display:grid;place-items:center;font-size:clamp(36px,6vw,64px);border:2.5px solid var(--ink);border-radius:4px;box-shadow:3px 3px 0 var(--ink)}
+.sq:nth-child(1){background:#ffe27a;transform:rotate(-4deg)}.sq:nth-child(2){background:#ffb3a3;transform:rotate(3deg)}
+.sq:nth-child(3){background:#a9c6ff;transform:rotate(2deg)}.sq:nth-child(4){background:#fff;transform:rotate(-3deg)}
+.card{flex:1 1 400px;padding:26px 28px;font-size:18px}
+.seg button{flex:none;width:38px;font-size:16px;padding:4px 0}.chips{display:flex;gap:8px;flex-wrap:wrap}.chips button{font-size:15px;padding:6px 12px}
+/* draw */
+#draw{display:flex;flex-direction:column;height:100vh;height:100dvh;overflow-y:auto;--s:min(calc(100dvh - 285px),calc((100vw - 250px)/2),620px)}
+
+.top{display:flex;align-items:center;gap:10px;padding:6px 14px}
+.top .mk{font-size:30px;transform:rotate(-1.5deg);background:none;border:0;padding:0;cursor:pointer;color:var(--ink)}.top .mk:hover{background:none;color:var(--acc)}.top .sp{flex:1}
+.lastbar{align-self:center;font-family:'Caveat Brush',cursive;font-size:clamp(22px,4.5vw,34px);background:var(--acc);color:#fff;border:2.5px solid var(--ink);border-radius:6px;box-shadow:4px 4px 0 var(--ink);padding:0 24px;margin:4px 12px 0;transform:rotate(-1deg);text-align:center}
+.tabs{display:none;gap:10px;padding:2px 14px 6px}.tabs button{flex:1;font-family:'Caveat Brush',cursive;font-weight:400;font-size:23px;background:var(--yel);border:2px solid var(--ink);border-radius:4px;transform:rotate(-1.5deg);padding:2px 8px}.tabs button+button{transform:rotate(1.5deg)}.tabs button:not(.on){opacity:.55}.tabs button.on{background:var(--yel);color:var(--ink);box-shadow:3px 3px 0 var(--ink)}
+.main{flex:1;display:flex;flex-direction:column;justify-content:flex-start;position:relative}
+.stage{position:relative;margin-top:14px;display:flex;gap:20px;justify-content:center;align-items:center;padding:0 12px}
+.pcol{display:flex;flex-direction:column;gap:6px}
+#draw>*{flex-shrink:0}.sub{position:relative;display:flex;align-items:center;padding:0 14px;min-height:60px}.sub .lastbar{position:absolute;left:50%;top:50%;margin:0;transform:translate(-50%,-50%) rotate(-1deg);white-space:nowrap}.pbar{display:flex;align-items:center;gap:8px}
+.plabel{font-family:'Caveat Brush',cursive;font-size:21px;background:var(--yel);padding:0 12px;border:2px solid var(--ink);transform:rotate(-2deg);border-radius:4px}
+.pcol.hid{display:none}
+.work{display:flex;gap:20px;align-items:center}
+.tb{display:flex;flex-direction:column;gap:6px;align-items:center;padding:7px;border:2.5px solid var(--ink);border-radius:14px 8px 14px 8px;background:#fff;box-shadow:4px 4px 0 var(--ink)}
+.box{position:relative;width:var(--s);height:var(--s);background:#fff;border:2.5px solid var(--ink);box-shadow:4px 4px 0 var(--ink)}
+.box img,.box canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+#ov{opacity:.3;display:none;pointer-events:none}
+#cv{touch-action:none;cursor:crosshair;z-index:1}
+.sizebox{display:flex;flex-direction:column;align-items:center;gap:4px;border-top:2px dashed var(--mute);padding-top:6px;width:100%}
+.dot{width:46px;height:46px;display:grid;place-items:center;overflow:hidden}.dot i{display:block;border-radius:50%;background:var(--ink)}
+#size{writing-mode:vertical-lr;direction:rtl;width:28px;height:90px}
+.cwrap{position:relative}.bottom{position:absolute;top:100%;left:50%;transform:translateX(-50%);width:max-content;max-width:calc(var(--s) + 140px);display:flex;flex-direction:column;gap:10px;align-items:center;padding:12px 12px 10px}.pal{display:grid;grid-template-columns:repeat(9,auto);gap:8px;justify-items:center}#pal{display:contents}
+.sw{width:30px;height:30px;padding:0;border-radius:50%}.sw.rainbow{background:conic-gradient(red,yellow,lime,cyan,blue,magenta,red)}#hue{-webkit-appearance:none;appearance:none;height:26px;border:2px solid var(--ink);border-radius:13px;background:linear-gradient(90deg,#f00,#ff0,#0f0,#0ff,#00f,#f0f,#f00)}#hue::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:32px;border-radius:7px;background:#fff;border:2px solid var(--ink)}#hue::-moz-range-thumb{width:10px;height:28px;border-radius:7px;background:#fff;border:2px solid var(--ink)}.pip{display:none}.bub{width:34px;height:34px;border-radius:50%;border:2.5px solid var(--ink);display:inline-block;flex:none;background:repeating-conic-gradient(#d6d6d6 0 25%,#fff 0 50%) 0 0/12px 12px}button.on:hover{background:var(--yel)}#pipBtn:not(.on):hover{background:#fff}.tabs button:hover,.tabs button.on:hover{background:var(--yel);color:var(--ink)}.ybtn{font-family:'Caveat Brush',cursive;font-weight:400;font-size:21px;background:var(--yel);border:2px solid var(--ink);border-radius:4px;transform:rotate(-1.5deg);padding:2px 14px;box-shadow:3px 3px 0 var(--ink)}.ybtn:hover{background:#ffe27a}.gbtn{background:#2f6bff;color:#fff;display:inline-flex;align-items:center;gap:8px;box-shadow:3px 3px 0 var(--ink)}.gbtn:hover{background:#4a80ff}.gi{background:#fff;border-radius:50%;width:24px;height:24px;display:grid;place-items:center}.gi svg{width:16px;height:16px}.opt{border:2px solid var(--ink);border-radius:10px;padding:10px 12px;margin-top:10px}.mbox h2{display:inline-block;background:var(--yel);padding:0 12px;transform:rotate(-1deg);border:2px solid var(--ink);border-radius:4px}.pipi svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.sw.sel{outline:3px solid var(--acc2);outline-offset:2px}
+.bottom input[type=color]{width:34px;height:34px;padding:0;border:2px solid var(--ink);border-radius:50%;background:none}
+#pimg{background:#fff}
+@media (max-width:700px){
+ #draw{--s:max(240px,min(calc(100vw - 14px),calc(100dvh - 330px)))}.stage{padding:0 4px}.box{box-shadow:3px 3px 0 var(--ink)}.work{flex-direction:column;gap:6px}.work .box{order:-1}.tb{flex-direction:row;flex-wrap:nowrap;gap:2px;max-width:100%;padding:0;border:0;box-shadow:none;background:none;width:auto}.ib{width:33px;height:33px}.ib svg{width:18px;height:18px}.sizebox{flex-direction:row;border-top:0;padding:0;width:auto;margin-left:6px;gap:2px}#size{writing-mode:horizontal-tb;direction:ltr;width:56px;height:24px}.dot{width:26px;height:26px}.pbar{display:none}.sub{min-height:0;padding:0 8px;justify-content:center}.sub .lastbar{position:static;transform:rotate(-1deg);white-space:normal;margin:4px auto;font-size:20px}.sw{width:26px;height:26px}.pal{gap:6px}.bottom{position:static;transform:none;width:100%;max-width:none;padding:8px 8px 10px;gap:8px;order:3}#ltb,#rtb{width:auto;max-width:100%;justify-content:center;gap:3px;padding:0}#rtb{max-width:none;justify-content:center;gap:3px}.cwrap{display:contents}#ltb{order:1}#rtb{order:2}.pip{display:flex;align-items:center;gap:6px;justify-content:center;font-weight:800;font-size:14px;margin-top:10px}
+ .tabs{display:flex}
+ .pcol{display:none}.show-prev .pcol{display:flex}.show-prev .work{display:none}#hideBtn{display:none}.top .mk{font-size:24px}}
+/* modal */
+.mod{position:fixed;inset:0;background:rgba(29,29,36,.45);display:grid;place-items:center;padding:16px;z-index:9}
+.mbox{position:relative;max-width:440px;width:100%;padding:22px;max-height:92vh;overflow:auto}
+.x{position:absolute;top:8px;right:8px;width:34px;height:34px}
+.lg{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:12px 0;padding-top:10px;border-top:2px dashed var(--mute)}
+.grid{display:grid;gap:10px;margin:18px 0}.grid img{width:100%;aspect-ratio:1;border:2.5px solid var(--ink);background:#fff;display:block}
+.grid .empty{aspect-ratio:1;border:2.5px dashed var(--mute)}
+</style></head><body>
+
+<section id="setup" class="hero">
+ <div class="hl"><h1>4 man comics</h1>
+  <p>Draw a panel, pass it on, and see how the story turns out. Each player only sees the panel before theirs.</p>
+  <div class="dd" aria-hidden="true"><div class="sq mk">1</div><div class="sq mk">2</div><div class="sq mk">3</div><div class="sq mk">?</div></div></div>
+ <div class="card wob">
+  <label for="np" style="margin-top:0">Players <span class="num" id="npv">4</span></label>
+  <input id="np" type="range" min="3" max="10" value="4" style="width:100%">
+  <div class="row" style="margin-top:14px;flex-wrap:nowrap;gap:10px"><b style="font-weight:800">Loops</b><span class="row seg" id="loops" style="gap:6px;flex-wrap:nowrap"></span><span id="sum" style="flex:1;min-width:0;font-size:14px;font-weight:700;line-height:1.2;color:var(--mute)"></span></div>
+  
+  <label>Who’s already on the site?</label>
+  <p class="mute">Friends you add get their turn automatically. You’re player 1.</p>
+  <div class="chips" id="chips"></div>
+  <button class="pri" id="go" style="margin-top:18px;width:100%;font-size:26px;padding:12px">Start drawing</button>
+  <p class="mute" style="margin-top:10px">Prototype: accounts, email and links are simulated.</p>
+ </div>
+</section>
+
+<section id="draw" class="hide">
+ <div class="top"><button class="mk" id="home" title="Back to home">4 man comics</button><span id="info" class="row"></span><span class="sp"></span></div>
+ <div class="sub"><div class="pbar" id="pbar"><span class="plabel">Previous panel</span><button class="ib" id="hideBtn" title="Hide previous panel" aria-label="Hide previous panel" data-i="eye"></button></div><div class="lastbar hide" id="last">Last panel! Give the story an ending.</div></div>
+ <div class="tabs"><button id="tPrev">Previous panel</button><button id="tDraw" class="on">Your panel</button></div>
+ <div class="main"><div class="stage" id="stage">
+  <div class="pcol" id="pcol">
+   <div class="box"><img id="pimg" alt="Previous panel"></div><div class="pip" id="pip"><button class="ib" id="pipBtn" data-i="pipette" title="Pick a color from this panel" aria-label="Pick a color from this panel"></button><span class="bub" id="bub"></span></div></div>
+  <div class="work">
+   <div class="tb" id="ltb">
+    <button class="ib on" data-t="brush" data-i="brush" title="Brush" aria-label="Brush"></button>
+    <button class="ib" data-t="eraser" data-i="eraser" title="Eraser" aria-label="Eraser"></button>
+    <button class="ib" data-t="fill" data-i="fill" title="Fill" aria-label="Fill"></button>
+    <button class="ib" data-t="line" data-i="line" title="Line" aria-label="Line"></button>
+    <button class="ib" data-t="rect" data-i="rect" title="Box" aria-label="Box"></button>
+    <button class="ib" data-t="ell" data-i="ell" title="Oval" aria-label="Oval"></button>
+    <button class="ib" data-t="eye" data-i="pipette" title="Pick color" aria-label="Pick color"></button>
+    <div class="sizebox" title="Brush size"><div class="dot"><i id="dotI"></i></div><input id="size" type="range" min="2" max="60" value="8" aria-label="Brush size"></div>
+   </div>
+   <div class="cwrap"><div class="box" id="dbox"><img id="ov" alt=""><canvas id="cv" width="800" height="800"></canvas></div><div class="bottom"><div class="pal"><span class="row" id="pal"></span><button class="sw rainbow" id="col" aria-label="More colors" title="More colors"></button></div><button class="pri" id="done" style="font-size:21px;padding:9px 34px">Finish</button></div></div>
+   <div class="tb" id="rtb">
+    <button class="ib" id="undo" data-i="undo" title="Undo" aria-label="Undo"></button>
+    <button class="ib" id="redo" data-i="redo" title="Redo" aria-label="Redo"></button>
+    <button class="ib" id="clr" data-i="trash" title="Clear drawing" aria-label="Clear drawing"></button>
+    <button class="ib" id="trace" data-i="layers" title="Trace previous panel" aria-label="Trace previous panel"></button>
+   </div>
+  </div>
+ </div>
+ </div>
+</section>
+
+<div class="mod hide" id="modal"><div class="mbox wob"><button class="ib x" id="mx" aria-label="Back to drawing" data-i="x"></button><div id="mc"></div></div></div>
+
+<div class="top hide" id="ftop"><button class="mk" id="home2" title="Back to home">4 man comics</button></div>
+<section id="final" class="hero hide" style="display:block;max-width:1400px;padding-top:10px">
+ 
+ <div id="namer" class="wob hide" style="max-width:640px;margin:0 auto 14px;padding:12px 16px"><b>Last panel done! Give your comic a name:</b><div class="row" style="margin-top:8px"><input id="ttl" type="text" maxlength="60" placeholder="e.g. The Case of the Missing Sock"><button class="pri" id="fin">Save name</button></div><span class="mute">Everyone will see this title.</span></div>
+<div id="gridEl" style="margin:18px 0"></div>
+ <p class="mute" style="text-align:center">The real site adds a download button and emails the link to everyone who logged in.</p>
+ <div style="text-align:center"><button class="pri" id="again" style="font-size:22px;padding:10px 30px">Make another</button></div>
+</section>
+
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const IC={brush:'M4 20c3 0 5-1 5-4l8-8-3-3-8 8c-2 1-2 5-2 7zM14 5l2-2 5 5-2 2',eraser:'M5 14l8-9 7 7-6 7H8zM9 9l7 7M8 19h12',fill:'M4 12l8-8 8 8-8 8zM8 8l8 8M21 15c1 2 2 3 2 4a2 2 0 01-4 0c0-1 1-2 2-4z',line:'M4 20L20 4',rect:'M4 6h16v12H4z',ell:'M12 5c5 0 9 3 9 7s-4 7-9 7-9-3-9-7 4-7 9-7z',pipette:'M20 4a2.2 2.2 0 00-3 0l-3 3-1-1-2 2 1 1-8 8v3h3l8-8 1 1 2-2-1-1 3-3a2.2 2.2 0 000-3z',undo:'M9 14L4 9l5-5M4 9h9a6 6 0 010 12h-3',redo:'M15 14l5-5-5-5M20 9h-9a6 6 0 000 12h3',trash:'M4 7h16M9 7V4h6v3M6 7l1 14h10l1-14',layers:'M12 3l9 5-9 5-9-5zM3 13l9 5 9-5',eye:'M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12zM12 9a3 3 0 100 6 3 3 0 000-6z',x:'M5 5l14 14M19 5L5 19',eyeoff:'M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12zM12 9a3 3 0 100 6 3 3 0 000-6zM3 3l18 18'};
+$$('[data-i]').forEach(b=>b.innerHTML=`<svg viewBox="0 0 24 24"><path d="${IC[b.dataset.i]}"/></svg>`);
+const cv=$('#cv'),ctx=cv.getContext('2d',{willReadFrequently:true});
+let players=4,loops=0,total=4,panels=[],friend=[],tool='brush',color='#1d1d24',undo=[],redo=[],snap,start,last,drawing=false,pending,saved=false,loggedIn=false;
+const show=id=>{['setup','draw','final'].forEach(s=>$('#'+s).classList.toggle('hide',s!==id));$('#ftop').classList.toggle('hide',id!=='final')};
+[['0',0],['1',1],['2',2]].forEach(([t,v])=>{const b=document.createElement('button');b.textContent=t;b.className=v?'':'on';b.onclick=()=>{loops=v;$$('#loops button').forEach(x=>x.classList.toggle('on',x===b));sum()};$('#loops').append(b)});
+function sum(){players=+$('#np').value;$('#npv').textContent=players;total=players*(loops+1);
+ $('#sum').textContent=loops?`${total} panels, everyone draws ${loops===1?'twice':'three times'}`:`${total} panels`;
+ friend.length=players;$('#chips').innerHTML='';
+ for(let i=1;i<players;i++){const b=document.createElement('button');const r=()=>{b.textContent=`Player ${i+1}: ${friend[i]?'friend ✓':'sent a link'}`;b.classList.toggle('on',!!friend[i])};r();b.onclick=()=>{friend[i]=!friend[i];r()};$('#chips').append(b)}}
+$('#np').oninput=sum;sum();
+['#1d1d24','#6b6b78','#ffffff','#ff5a3c','#ff8a3c','#ffc233','#f5e14a','#3bb273','#1f7a4d','#2fc4d9','#2f6bff','#1a3d99','#8a4fff','#ff8fb1','#8b5a2b','#f2c9a0','#b5e48c'].forEach(c=>{const b=document.createElement('button');b.className='sw';b.style.background=c;b.dataset.c=c;b.setAttribute('aria-label','Color '+c);b.onclick=()=>setCol(c);$('#pal').append(b)});
+function setCol(c){color=c;$$('.sw').forEach(s=>s.classList.toggle('sel',s.dataset.c===c));$('#col').classList.toggle('sel',!$$('.sw[data-c]').some(s=>s.dataset.c===c));dot()}
+function dot(){const v=+$('#size').value,w=cv.getBoundingClientRect().width,sc=w?w/800:.75,px=Math.max(2,Math.min(46,v*sc))+'px';Object.assign($('#dotI').style,{width:px,height:px,background:tool==='eraser'?'#ccc':color})}
+$('#col').onclick=picker;$('#size').oninput=dot;window.addEventListener('resize',dot);setCol(color);
+$$('[data-t]').forEach(b=>b.onclick=()=>{tool=b.dataset.t;$$('[data-t]').forEach(x=>x.classList.toggle('on',x===b));dot()});
+
+const clear=()=>ctx.clearRect(0,0,800,800);
+const push=()=>{undo.push(ctx.getImageData(0,0,800,800));if(undo.length>30)undo.shift();redo=[]};
+$('#undo').onclick=()=>{if(!undo.length)return;redo.push(ctx.getImageData(0,0,800,800));ctx.putImageData(undo.pop(),0,0)};
+$('#redo').onclick=()=>{if(!redo.length)return;undo.push(ctx.getImageData(0,0,800,800));ctx.putImageData(redo.pop(),0,0)};
+$('#clr').onclick=()=>{push();clear()};
+const pt=e=>{const r=cv.getBoundingClientRect();return[(e.clientX-r.left)*800/r.width,(e.clientY-r.top)*800/r.height]};
+const eff=(d,i)=>{const a=d[i+3]/255;return[0,1,2].map(k=>Math.round(d[i+k]*a+255*(1-a)))};
+const hex=c=>'#'+c.map(n=>n.toString(16).padStart(2,'0')).join('');
+cv.onpointerdown=e=>{e.preventDefault();cv.setPointerCapture(e.pointerId);const [x,y]=pt(e);
+ if(tool==='eye'){setCol(hex(eff(ctx.getImageData(x|0,y|0,1,1).data,0)));return}
+ push();if(tool==='fill'){fill(x|0,y|0);return}
+ drawing=true;start=last=[x,y];snap=ctx.getImageData(0,0,800,800);if(tool==='brush'||tool==='eraser')stroke(last,last)};
+cv.onpointermove=e=>{if(!drawing)return;const p=pt(e);if(tool==='brush'||tool==='eraser'){stroke(last,p);last=p}else{ctx.putImageData(snap,0,0);shape(start,p)}};
+cv.onpointerup=cv.onpointercancel=()=>{drawing=false};
+function style(){ctx.globalCompositeOperation=tool==='eraser'?'destination-out':'source-over';ctx.strokeStyle=color;ctx.lineWidth=+$('#size').value;ctx.lineCap=ctx.lineJoin='round'}
+function stroke(a,b){style();ctx.beginPath();ctx.moveTo(...a);ctx.lineTo(...b);ctx.stroke()}
+function shape(a,b){style();ctx.beginPath();
+ if(tool==='line'){ctx.moveTo(...a);ctx.lineTo(...b)}else if(tool==='rect')ctx.rect(a[0],a[1],b[0]-a[0],b[1]-a[1]);
+ else ctx.ellipse((a[0]+b[0])/2,(a[1]+b[1])/2,Math.abs(b[0]-a[0])/2,Math.abs(b[1]-a[1])/2,0,0,7);ctx.stroke()}
+function fill(x,y){ctx.globalCompositeOperation='source-over';const id=ctx.getImageData(0,0,800,800),d=id.data,t=eff(d,(y*800+x)*4),h=color.slice(1).match(/../g).map(v=>parseInt(v,16));
+ if(Math.abs(t[0]-h[0])+Math.abs(t[1]-h[1])+Math.abs(t[2]-h[2])<10)return;
+ const seen=new Uint8Array(640000),st=[y*800+x];
+ while(st.length){const p=st.pop();if(seen[p])continue;seen[p]=1;const i=p*4,e=eff(d,i);
+  if(Math.abs(e[0]-t[0])+Math.abs(e[1]-t[1])+Math.abs(e[2]-t[2])>90)continue;
+  d[i]=h[0];d[i+1]=h[1];d[i+2]=h[2];d[i+3]=255;const px=p%800;
+  if(px>0)st.push(p-1);if(px<799)st.push(p+1);if(p>=800)st.push(p-800);if(p<639200)st.push(p+800)}
+ ctx.putImageData(id,0,0)}
+const exportPng=()=>{const c=document.createElement('canvas');c.width=c.height=800;const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,800,800);x.drawImage(cv,0,0);return c.toDataURL('image/png')};
+
+function tab(p){setTimeout(dot,0);$('#stage').classList.toggle('show-prev',p);$('#tPrev').classList.toggle('on',p);$('#tDraw').classList.toggle('on',!p)}
+$('#tPrev').onclick=()=>tab(true);$('#tDraw').onclick=()=>tab(false);
+function pickPrev(e){const im=$('#pimg'),m=matchMedia('(max-width:700px)').matches;if(!im.naturalWidth||(m?!pipOn:tool!=='eye'))return;const r=im.getBoundingClientRect(),c=document.createElement('canvas');c.width=c.height=800;const x=c.getContext('2d');x.drawImage(im,0,0,800,800);const d=x.getImageData(Math.min(799,(e.clientX-r.left)*800/r.width|0),Math.min(799,(e.clientY-r.top)*800/r.height|0),1,1).data;const hx=hex([d[0],d[1],d[2]]);setCol(hx);$('#bub').style.background=hx}
+let pipOn=false;$('#pipBtn').onclick=()=>{pipOn=!pipOn;$('#pipBtn').classList.toggle('on',pipOn)};
+$('#pimg').onclick=pickPrev;
+const setEye=h=>{$('#hideBtn').innerHTML=`<svg viewBox="0 0 24 24"><path d="${IC[h?'eyeoff':'eye']}"/></svg>`;$('#hideBtn').title=h?'Show previous panel':'Hide previous panel'};
+$('#hideBtn').onclick=()=>setEye($('#pcol').classList.toggle('hid'));
+$('#trace').onclick=()=>{const on=$('#ov').style.display!=='block';$('#ov').style.display=on?'block':'none';$('#trace').classList.toggle('on',on)};
+function turn(){clear();undo=[];redo=[];show('draw');tab(false);const has=panels.length>0;
+ $('#pcol').classList.toggle('hide',!has);$('#pbar').classList.toggle('hide',!has);$('#pcol').classList.remove('hid');setEye(false);pipOn=false;$('#pipBtn').classList.remove('on');$('#bub').style.background='';$('#tPrev').classList.toggle('hide',!has);$('#trace').classList.toggle('hide',!has);
+ $('#ov').style.display='none';$('#trace').classList.remove('on');
+ if(has)$('#pimg').src=$('#ov').src=panels[panels.length-1];
+ $('#last').classList.toggle('hide',panels.length!==total-1);
+ $('#info').innerHTML=`<span class="pill">${players} players</span><span class="pill">${loops?'Loops '+(loops===1?'once':'twice'):'No loop'}</span>`;$('#draw').classList.toggle('islast',panels.length===total-1);dot()}
+$('#go').onclick=()=>{panels=[];turn()};
+
+function modal(h,closable){$('#mc').innerHTML=h;$('#mx').classList.toggle('hide',!closable);$('#modal').classList.remove('hide')}
+const close=()=>$('#modal').classList.add('hide');
+$('#mx').onclick=close;
+$('#home').onclick=()=>{modal(`<h2>Leave this comic?</h2><p>Your unsent drawing and any panels so far will be lost.</p><div class="row" style="margin-top:12px"><button id="stay">Keep drawing</button><button class="pri" id="leave">Leave</button></div>`,true);$('#stay').onclick=close;$('#leave').onclick=()=>{close();show('setup')}};
+$('#done').onclick=()=>{const n=panels.length,nxt=(n+1)%players,name='Player '+(nxt+1);pending=exportPng();
+ if(n+1>=total){panels.push(pending);finish('');return}
+ if(friend[nxt]){panels.push(pending);modal(`<h2>Panel sent!</h2><p>Your panel went to ${name}’s account and they’ve been told it’s their turn. You’re all done.</p><button class="pri" id="cont" style="margin-top:10px">Continue as ${name} (demo)</button>`,false);$('#cont').onclick=()=>{close();turn()};return}
+ saved=false;
+ modal(`<h2>Pass it on to ${name}</h2><p class="mute">${name} isn’t added as a friend, so you need to send them this panel to keep the comic going.</p>
+ <div class="opt" style="background:#e6efff"><label style="margin-top:0">Send by email</label><div class="row"><input type="text" id="em" placeholder="friend@example.com"><button class="ybtn" id="send">Send</button></div><p class="mute" style="margin:6px 0 0">Emails are used once and never stored.</p></div>
+ <div class="opt" style="background:#ffe8e0"><label style="margin-top:0">Or share a link</label><div class="row" id="lrow"><button class="ybtn" id="getlink">Create link and copy</button></div></div>
+ <p class="mute" id="st"></p>
+ <div class="lg"><span class="mute">Want the finished comic in your inbox?</span><button class="gbtn" id="g">${loggedIn?'Logged in ✓':GI+'Log in with Google'}</button></div>
+ <button class="pri hide" id="cont">Continue as ${name} (demo)</button>`,true);
+ const save=m=>{if(!saved){panels.push(pending);saved=true;$('#mx').classList.add('hide');$('#cont').classList.remove('hide')}$('#st').textContent=m};
+ $('#send').onclick=()=>{$('#em').value?save('Sent! Panel saved. Waiting on '+name+'.'):$('#st').textContent='Enter an email first.'};
+ $('#getlink').onclick=()=>{const u='https://4mancomics.example/turn/'+Math.random().toString(36).slice(2,12)+Math.random().toString(36).slice(2,10);$('#lrow').innerHTML='<input type="text" id="lnk" readonly value="'+u+'"><button class="ybtn" id="copy">Copy link</button>';try{navigator.clipboard.writeText(u)}catch(e){}save('Link created, copied and panel saved. Send it to '+name+'.');$('#copy').onclick=()=>{$('#lnk').select();try{navigator.clipboard.writeText(u)}catch(e){}$('#st').textContent='Link copied. Send it to '+name+'.'}};
+ $('#g').onclick=()=>{loggedIn=true;$('#g').innerHTML=GI+'Logged in ✓'};
+ $('#cont').onclick=()=>{close();turn()}};
+async function finish(title){const n=panels.length,c=n<=3||n===5?n:n===4?2:n<=10?Math.ceil(n/2):Math.ceil(Math.sqrt(n)),r=Math.ceil(n/c),P=600,G=28,H=title?130:G,k=document.createElement('canvas');k.width=G+c*(P+G);k.height=H+r*(P+G);const x=k.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,k.width,k.height);
+ try{await document.fonts.load("80px 'Caveat Brush'")}catch(e){}
+ if(title){x.fillStyle='#1d1d24';x.textAlign='center';x.font="84px 'Caveat Brush',cursive";x.fillText(title,k.width/2,92,k.width-2*G)}
+ const imgs=await Promise.all(panels.map(s=>new Promise(res=>{const i=new Image();i.onload=()=>res(i);i.src=s})));
+ imgs.forEach((i,j)=>{const px=G+(j%c)*(P+G),py=H+Math.floor(j/c)*(P+G);x.drawImage(i,px,py,P,P);x.lineWidth=6;x.strokeStyle='#1d1d24';x.strokeRect(px-3,py-3,P+6,P+6)});
+ const im=new Image();im.src=k.toDataURL('image/png');im.alt=title;im.style.cssText='width:100%;display:block;background:#fff;border:2.5px solid #1d1d24;box-shadow:4px 4px 0 #1d1d24';$('#gridEl').replaceChildren(im);$('#namer').classList.toggle('hide',!!title);if(!title)$('#ttl').value='';show('final')}
+ 
+ 
+$('#again').onclick=()=>show('setup');$('#home2').onclick=()=>show('setup');$('#fin').onclick=()=>finish($('#ttl').value.trim()||'Untitled comic');
+const GI='<span class="gi"><svg viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.9 6.1C12.4 13.6 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4.1 7.1-10.1 7.1-17.5z"/><path fill="#FBBC05" d="M10.5 28.7c-.5-1.5-.8-3-.8-4.7s.3-3.2.8-4.7l-7.9-6.1C.9 16.4 0 20.1 0 24s.9 7.6 2.6 10.8l7.9-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.5-5.8c-2.1 1.4-4.9 2.3-8.4 2.3-6.3 0-11.6-4.1-13.5-9.8l-7.9 6.1C6.5 42.6 14.6 48 24 48z"/></svg></span>';
+function picker(){let h=200,s=1,v=1;const hsv=(h,s,v)=>{const f=n=>{const k=(n+h/60)%6;return v-v*s*Math.max(0,Math.min(k,4-k,1))};return[f(5),f(3),f(1)].map(q=>Math.round(q*255))};
+ modal(`<h2>Pick a color</h2><canvas id="sv" width="300" height="200" style="width:100%;touch-action:none;border:2px solid #1d1d24;border-radius:8px;display:block;margin-top:8px"></canvas><input id="hue" type="range" min="0" max="359" value="200" style="width:100%;margin-top:12px"><div class="row" style="margin-top:12px"><span id="pv" style="display:inline-block;width:34px;height:34px;border-radius:50%;border:2px solid #1d1d24"></span><button class="pri" id="usec">Use this color</button></div>`,true);
+ const c=$('#sv'),x=c.getContext('2d');
+ const draw=()=>{x.fillStyle='hsl('+h+',100%,50%)';x.fillRect(0,0,300,200);let g=x.createLinearGradient(0,0,300,0);g.addColorStop(0,'#fff');g.addColorStop(1,'rgba(255,255,255,0)');x.fillStyle=g;x.fillRect(0,0,300,200);g=x.createLinearGradient(0,0,0,200);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,'#000');x.fillStyle=g;x.fillRect(0,0,300,200);x.beginPath();x.arc(s*300,(1-v)*200,9,0,7);x.lineWidth=3;x.strokeStyle='#fff';x.stroke();x.lineWidth=1;x.strokeStyle='#000';x.stroke();$('#pv').style.background=hex(hsv(h,s,v))};
+ const mv=e=>{const r=c.getBoundingClientRect();s=Math.min(1,Math.max(0,(e.clientX-r.left)/r.width));v=1-Math.min(1,Math.max(0,(e.clientY-r.top)/r.height));draw()};
+ c.onpointerdown=e=>{c.setPointerCapture(e.pointerId);c.dragging=1;mv(e)};c.onpointermove=e=>{if(c.dragging)mv(e)};c.onpointerup=()=>{c.dragging=0};
+ $('#hue').oninput=e=>{h=+e.target.value;draw()};$('#usec').onclick=()=>{setCol(hex(hsv(h,s,v)));close()};draw()}
+</script></body></html>

@@ -2,7 +2,14 @@ import { db, json, newToken, hash, nextSlot, openSlot, finishComic, sendFinal, s
 import { getUser } from '@/lib/auth';
 import { turnMail } from '@/lib/email';
 
-// POST /api/comics/:id/(name|resend|skip|cancel)
+async function removeComic(id) { // panels first, then the row (slots and participants cascade)
+  const { data: files } = await db.storage.from('panels').list(id);
+  if (files?.length) await db.storage.from('panels').remove(files.map((f) => `${id}/${f.name}`));
+  await db.from('comics').delete().eq('id', id);
+  return { ok: true, deleted: true };
+}
+
+// POST /api/comics/:id/(name|resend|skip|cancel|delete)   cancel body: { mode: "delete" (default) | "notify" }
 export async function POST(req, { params }) {
   const { id, action } = await params;
   const body = await req.json().catch(() => ({}));
@@ -19,10 +26,12 @@ export async function POST(req, { params }) {
 
   const u = await getUser();
   if (!u || u.id !== c.creator_id) return json({ error: 'forbidden' }, 403);
+  if (action === 'delete') return json(await removeComic(id)); // any status, creator only
   if (c.status !== 'active') return json({ error: 'not-active' }, 409);
   const { data: cur } = await db.from('slots').select('*').match({ comic_id: id, idx: c.current_idx }).single();
 
   if (action === 'cancel') {
+    if (body.mode !== 'notify') return json(await removeComic(id)); // default: cancel and delete, nobody is emailed
     await db.from('comics').update({ status: 'canceled', finished_at: new Date().toISOString() }).eq('id', id);
     await sendEnded(c, 'the creator canceled it');
     return json({ ok: true });

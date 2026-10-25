@@ -15,7 +15,8 @@ export async function GET(_req, { params }) {
   const c = s.comics;
   const { data: prev } = await db.from('slots').select('panel_path').eq('comic_id', c.id).lt('idx', s.idx).not('panel_path', 'is', null).order('idx', { ascending: false }).limit(1);
   const prevUrl = prev?.[0] ? (await db.storage.from('panels').createSignedUrl(prev[0].panel_path, 3600)).data.signedUrl : null;
-  return json({ prevUrl, isLast: !(await nextSlot(c.id, s.idx)), players: c.players, loops: c.loops, loggedIn: !!(await getUser()) });
+  const nx = await nextSlot(c.id, s.idx);
+  return json({ prevUrl, isLast: !nx, nextHasAccount: !!nx?.user_id, players: c.players, loops: c.loops, loggedIn: !!(await getUser()) });
 }
 
 // POST { png: dataURL, mode: 'email'|'link', email? }  (mode only needed when the next player has no account)

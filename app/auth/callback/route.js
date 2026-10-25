@@ -1,14 +1,17 @@
 import { NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
 import { supabaseServer, ensureProfile } from '@/lib/auth';
 
 export async function GET(req) {
-  const url = new URL(req.url), code = url.searchParams.get('code');
-  const next = url.searchParams.get('next');
-  const dest = next && next.startsWith('/') && !next.startsWith('//') ? next : '/dashboard';
+  const code = new URL(req.url).searchParams.get('code');
+  const jar = await cookies();
+  const next = jar.get('next')?.value || '/';
+  const dest = next.startsWith('/') && !next.startsWith('//') ? next : '/';
   if (code) {
-    const sb = await supabaseServer();
-    const { data } = await sb.auth.exchangeCodeForSession(code);
+    const { data } = await (await supabaseServer()).auth.exchangeCodeForSession(code);
     if (data?.user) await ensureProfile(data.user);
   }
-  return NextResponse.redirect(new URL(dest, process.env.NEXT_PUBLIC_SITE_URL));
+  const res = NextResponse.redirect(new URL(dest, process.env.NEXT_PUBLIC_SITE_URL));
+  res.cookies.delete('next');
+  return res;
 }

@@ -1,0 +1,18 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>4 man comics</title>
+<link href="https://fonts.googleapis.com/css2?family=Caveat+Brush&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet"><link rel="stylesheet" href="/studio.css"></head><body>
+<div class="top" id="nav"></div>
+<section id="setup" class="hero">
+ <div class="hl"><h1>4 man comics</h1>
+  <p>Draw a panel, pass it on, and see how the story turns out. Each player only sees the panel before theirs.</p>
+  <div class="dd" aria-hidden="true"><div class="sq mk">1</div><div class="sq mk">2</div><div class="sq mk">3</div><div class="sq mk">?</div></div></div>
+ <div class="card wob">
+  <label for="np" style="margin-top:0">Players <span class="num" id="npv">4</span></label>
+  <input id="np" type="range" min="3" max="10" value="4" style="width:100%">
+  <div class="row" style="margin-top:14px;flex-wrap:nowrap;gap:10px"><b style="font-weight:800">Loops</b><span class="row seg" id="loops" style="gap:6px;flex-wrap:nowrap"></span><span id="sum" style="flex:1;min-width:0;font-size:14px;font-weight:700;line-height:1.2;color:var(--mute)"></span></div>
+  
+  
+  <div id="loginbox" class="opt hide" style="background:#e6efff"><b>Log in to start a comic</b><p class="mute">Creators get reminders and can resend, skip or cancel from My comics.</p><a class="gbtn" id="glogin" href="/auth/login?next=/"></a></div><button class="pri" id="go" style="margin-top:18px;width:100%;font-size:26px;padding:12px">Start drawing</button>
+  
+ </div>
+</section>
+<script src="/shell.js"></script><script src="/home.js"></script></body></html>

@@ -16,14 +16,14 @@ export async function GET(_req, { params }) {
   const { data: prev } = await db.from('slots').select('panel_path').eq('comic_id', c.id).lt('idx', s.idx).not('panel_path', 'is', null).order('idx', { ascending: false }).limit(1);
   const prevUrl = prev?.[0] ? (await db.storage.from('panels').createSignedUrl(prev[0].panel_path, 3600)).data.signedUrl : null;
   const nx = await nextSlot(c.id, s.idx);
-  return json({ prevUrl, isLast: !nx, nextHasAccount: !!nx?.user_id, players: c.players, loops: c.loops, loggedIn: !!(await getUser()) });
+  return json({ comicId: c.id, prevUrl, isLast: !nx, nextHasAccount: !!nx?.user_id, players: c.players, loops: c.loops, loggedIn: !!(await getUser()) });
 }
 
 // POST { png: dataURL, mode: 'email'|'link', email? }  (mode only needed when the next player has no account)
 export async function POST(req, { params }) {
   const s = await findTurn((await params).token);
   if (!s) return json({ error: 'invalid-or-used' }, 404);
-  const c = s.comics, { png, mode, email, token: clientToken } = await req.json();
+  const c = s.comics, { png, mode, email, token: clientToken, nameToken: clientName } = await req.json();
   if (typeof png !== 'string' || !png.startsWith('data:image/png;base64,') || png.length > 4_000_000) return json({ error: 'bad-image' }, 400);
   const next = await nextSlot(c.id, s.idx);
   if (next && !next.user_id) {
@@ -38,7 +38,7 @@ export async function POST(req, { params }) {
   // Burn the token and claim the slot in one step; if someone else already did, stop.
   const { data: claimed } = await db.from('slots').update({ panel_path: path, token_hash: null, user_id: user?.id ?? s.user_id }).match({ comic_id: c.id, idx: s.idx }).is('panel_path', null).select();
   if (!claimed?.length) return json({ error: 'invalid-or-used' }, 409);
-  if (!next) return json({ done: true, comicId: c.id, nameToken: await finishComic(c.id) });
+  if (!next) return json({ done: true, comicId: c.id, nameToken: await finishComic(c.id, /^[A-Za-z0-9_-]{43}$/.test(clientName || '') ? clientName : undefined) });
   const given = mode === 'link' && /^[A-Za-z0-9_-]{43}$/.test(clientToken || '') ? clientToken : undefined; // 32 random bytes, base64url, made in the browser
   const token = await openSlot(c.id, next, given); // emails the next player automatically if they have an account
   if (next.user_id) return json({ nextHasAccount: true });

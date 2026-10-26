@@ -25,6 +25,15 @@ export async function POST(req, { params }) {
   }
 
   const u = await getUser();
+  if (action === 'join') { // the player whose turn it is opens it from their dashboard: fresh token, any emailed link stops working
+    if (!u) return json({ error: 'login-required' }, 401);
+    if (c.status !== 'active') return json({ error: 'not-active' }, 409);
+    const { data: mine } = await db.from('slots').select('*').match({ comic_id: id, idx: c.current_idx }).single();
+    if (!mine || mine.user_id !== u.id) return json({ error: 'forbidden' }, 403);
+    const token = newToken();
+    await db.from('slots').update({ token_hash: hash(token) }).match({ comic_id: id, idx: mine.idx });
+    return json({ link: turnLink(token) });
+  }
   if (!u || u.id !== c.creator_id) return json({ error: 'forbidden' }, 403);
   if (action === 'delete') return json(await removeComic(id)); // any status, creator only
   if (c.status !== 'active') return json({ error: 'not-active' }, 409);

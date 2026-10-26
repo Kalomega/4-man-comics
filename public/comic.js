@@ -5,7 +5,13 @@ async function compose(urls,title){const n=urls.length,c=n<=3||n===5?n:n===4?2:n
  const imgs=await Promise.all(urls.map(u=>new Promise(res=>{const i=new Image();i.crossOrigin='anonymous';i.onload=()=>res(i);i.src=u})));
  imgs.forEach((i,j)=>{const px=G+(j%c)*(P+G),py=H+Math.floor(j/c)*(P+G);x.drawImage(i,px,py,P,P);x.lineWidth=6;x.strokeStyle='#1d1d24';x.strokeRect(px-3,py-3,P+6,P+6)});
  return k.toDataURL('image/png')}
-(async()=>{try{const r=await fetch('/api/comics/'+id),d=await r.json();
+(async()=>{try{
+ const key='submit:'+id,pend=JSON.parse(sessionStorage.getItem(key)||'null');
+ if(pend){ // the last drawer was sent here instantly; their panel is saved now, while the spinner shows
+  const rr=await fetch('/api/turn/'+pend.token,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({png:pend.png,nameToken:pend.nameToken})}),dd=await rr.json().catch(()=>({}));
+  if(rr.ok||dd.error==='invalid-or-used'){sessionStorage.removeItem(key);sessionStorage.setItem('name:'+id,pend.nameToken)}
+  else{$('#msg').classList.remove('hide');$('#msg').innerHTML='<h2>Couldn’t save your panel</h2><p>Check your connection and try again.</p><button class="pri" id="retry">Try again</button>';$('#retry').onclick=()=>location.reload();return}}
+ const r=await fetch('/api/comics/'+id),d=await r.json();
  if(!r.ok||d.status==='active'){$('#msg').classList.remove('hide');$('#msg').innerHTML=d.status==='active'?`<h2>Still in progress</h2><p>Panel ${d.panel} of ${d.total}${d.loop?`, loop ${d.loop} of ${d.loops}`:''}${d.waitingOn?`, waiting on ${d.waitingOn}`:''}.</p>`:'<h2>Comic not available</h2><p>This comic is still in progress or the link is wrong. Log in to see its status if you’re part of it.</p>';return}
  let title=d.title;const nt=sessionStorage.getItem('name:'+id);
  if(d.status!=='done'){$('#msg').classList.remove('hide');$('#msg').innerHTML='<p><b>This comic ended early</b> ('+(d.status==='canceled'?'canceled by its creator':'a turn took too long')+'). Here’s what was finished.</p>'}

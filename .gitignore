@@ -1,5 +1,6 @@
 node_modules
 .next
-.env*
-supabase
+.env.local
+.env.example
+supabase/
 README.md

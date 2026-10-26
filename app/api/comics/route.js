@@ -33,12 +33,13 @@ export async function GET() {
   const { data } = await db.from('participants').select('comics(id,title,status,players,loops,total,current_idx,creator_id,turn_started_at)').eq('user_id', u.id);
   const comics = (data || []).map((r) => r.comics).filter(Boolean);
   const ids = comics.filter((c) => c.status === 'active').map((c) => c.id);
-  const { data: slots } = ids.length ? await db.from('slots').select('comic_id,idx,panel_path,profiles(name)').in('comic_id', ids) : { data: [] };
+  const { data: slots } = ids.length ? await db.from('slots').select('comic_id,idx,panel_path,user_id,profiles(name)').in('comic_id', ids) : { data: [] };
   return json({ comics: comics.map((c) => {
     const base = { ...c, isCreator: c.creator_id === u.id };
     if (c.status !== 'active') return base;
     const ss = (slots || []).filter((x) => x.comic_id === c.id);
     return { ...base, panel: ss.filter((x) => x.panel_path).length + 1, loop: c.loops ? Math.floor(c.current_idx / c.players) + 1 : null,
-      loops: c.loops + 1, waitingOn: ss.find((x) => x.idx === c.current_idx)?.profiles?.name || null };
+      loops: c.loops + 1, waitingOn: ss.find((x) => x.idx === c.current_idx)?.profiles?.name || null,
+      myTurn: ss.find((x) => x.idx === c.current_idx)?.user_id === u.id };
   }) });
 }

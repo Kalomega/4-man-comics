@@ -74,26 +74,33 @@ async function submit(extra){const r=await fetch('/api/turn/'+token,{method:'POS
 const fail=d=>{$('#st')?($('#st').textContent=d.error==='invalid-or-used'?'This link was already used.':'Something went wrong. Please try again.'):modal('<h2>Couldn’t save</h2><p>Something went wrong. Please try again.</p>',true)};
 function login(){try{sessionStorage.setItem('draft:'+token,cv.toDataURL())}catch(e){}location='/auth/login?next='+encodeURIComponent(location.pathname)}
 let inflight=null,failed=false;
-function markSaved(msg){$('#mx').classList.add('hide');$('#st').textContent=msg;$('#mc').insertAdjacentHTML('beforeend','<button class="pri" id="fin" style="margin-top:10px">Done</button>');
- $('#fin').onclick=async()=>{const b=$('#fin');b.disabled=true;b.textContent='Finishing…';try{await inflight}catch(e){}if(!failed)location='/'}}
-async function sendNow(){const r=await submit({});if(!r.ok)return fail(r.d);const d=r.d;
- if(d.done){sessionStorage.setItem('name:'+d.comicId,d.nameToken);location='/comic/'+d.comicId;return}
- modal(`<h2>Panel sent!</h2><p>Your panel went to the next player’s account and they’ve been told it’s their turn. You’re all done.</p><button class="pri" id="fin" style="margin-top:10px">Done</button>`,false);$('#fin').onclick=()=>{location='/'}}
 function mkToken(){const b=crypto.getRandomValues(new Uint8Array(32));return btoa(String.fromCharCode(...b)).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')}
-function undoSaved(d){openShare();$('#st').textContent=d.error==='invalid-or-used'?'This turn was already submitted.':'That didn’t go through, so nothing was sent. Please try again.'}
-function track(p){failed=false;inflight=p.then(r=>{if(!r.ok){failed=true;undoSaved(r.d)}return r});return inflight}
-function openShare(){const tok=mkToken();let busy=false; // link is made now (not shown) so it can appear instantly on click
- modal(`<h2>Pass it on</h2><p class="mute">The next player isn’t added as a friend, so send them your panel to keep the comic going.</p>
- <div class="opt" style="background:#e6efff"><label style="margin-top:0">Send by email</label><div class="row"><input type="text" id="em" placeholder="friend@example.com"><button class="ybtn" id="send">Send</button></div><p class="mute" style="margin:6px 0 0">Emails are used once and never stored.</p></div>
- <div class="opt" style="background:#ffe8e0"><label style="margin-top:0">Or share a link</label><div class="row" id="lrow"><button class="ybtn" id="getlink">Create link and copy</button></div></div>
- <p class="mute" id="st"></p>${info.loggedIn?'':`<div class="lg"><span class="mute">Want the finished comic in your inbox?</span><button class="gbtn" id="g">${GI}Log in with Google</button></div>`}`,true);
- $('#send').onclick=()=>{if(busy)return;const e=$('#em').value.trim();if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e))return $('#st').textContent='Enter a valid email first.';
-  busy=true;markSaved('Sent! The next player is being emailed.');track(submit({mode:'email',email:e}))};
- $('#getlink').onclick=()=>{if(busy)return;busy=true;const u=location.origin+'/play/'+tok;
-  $('#lrow').innerHTML='<input type="text" id="lnk" readonly value="'+u+'"><button class="ybtn" id="copy">Copy link</button>';
-  $('#copy').onclick=()=>{$('#lnk').select();try{navigator.clipboard.writeText(u)}catch(e){}};try{navigator.clipboard.writeText(u)}catch(e){}
-  markSaved('Link created and copied. Send it to the next player.');track(submit({mode:'link',token:tok}))};
- if($('#g'))$('#g').onclick=login}
+function track(p,onFail=undoSaved){failed=false;inflight=p.then(r=>{if(!r.ok){failed=true;onFail(r.d)}return r});return inflight}
+async function waitThenHome(btn){btn.disabled=true;btn.textContent='Finishing…';try{await inflight}catch(e){}if(!failed)location='/'}
+function undoSaved(d){openShare();$('#mc').insertAdjacentHTML('afterbegin','<p class="mute" style="color:#c0392b;font-weight:800">'+(d.error==='invalid-or-used'?'This turn was already submitted.':'That didn’t go through, so nothing was sent. Please try again.')+'</p>')}
+async function sendNow(){
+ if(info.isLast){const nameToken=mkToken(); // go to the finished comic right away; that page saves the panel behind its spinner
+  try{sessionStorage.setItem('submit:'+info.comicId,JSON.stringify({token,png:pending,nameToken}));location='/comic/'+info.comicId;return}catch(e){}
+  const r=await submit({nameToken});if(!r.ok)return fail(r.d);sessionStorage.setItem('name:'+r.d.comicId,r.d.nameToken);location='/comic/'+r.d.comicId;return}
+ modal(`<h2>Panel sent!</h2><p>Your panel went to the next player’s account and they’ve been told it’s their turn. You’re all done.</p><button class="pri" id="fin" style="margin-top:10px">Done</button>`,false);
+ $('#fin').onclick=()=>waitThenHome($('#fin'));
+ track(submit({}),d=>modal('<h2>Couldn’t send</h2><p>'+(d.error==='invalid-or-used'?'This turn was already submitted.':'Something went wrong, so your panel wasn’t sent. Close this and press Finish to try again.')+'</p>',true))}
+function openShare(){const tok=mkToken();let sent=false;
+ const lg=info.loggedIn?'':`<div class="lg"><span class="mute">Want the finished comic in your inbox?</span><button class="gbtn" id="g">${GI}Log in with Google</button></div>`;
+ function home(){modal(`<h2>Pass it on</h2><p class="mute">The next player isn’t added as a friend, so send them your panel to keep the comic going. How do you want to do it?</p><div class="row" style="gap:12px;margin:12px 0"><button class="ybtn" id="optE">Send by email</button><button class="ybtn" id="optL">Share a link</button></div>${lg}`,true);
+  $('#optE').onclick=emailView;$('#optL').onclick=linkView;if($('#g'))$('#g').onclick=login}
+ function emailView(){modal(`<h2>Send by email</h2><div class="opt" style="background:#e6efff"><div class="row"><input type="text" id="em" placeholder="friend@example.com"><button class="ybtn" id="send">Send</button></div><p class="mute" style="margin:6px 0 0">Emails are used once and never stored.</p></div><p class="mute" id="st"></p><button id="back">Back</button>`,true);
+  $('#back').onclick=home;$('#em').focus();
+  $('#send').onclick=()=>{const e=$('#em').value.trim();if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e))return $('#st').textContent='Enter a valid email first.';
+   sent=true;modal(`<h2>Sent!</h2><p>The next player is being emailed, and your panel is saved.</p><button class="pri" id="fin" style="margin-top:10px">Done</button>`,false);
+   $('#fin').onclick=()=>waitThenHome($('#fin'));track(submit({mode:'email',email:e}))}}
+ function linkView(){const u=location.origin+'/play/'+tok;
+  modal(`<h2>Share a link</h2><div class="opt" style="background:#ffe8e0"><div class="row"><div class="linkbox">${u}</div><button class="ybtn" id="copy">Copy link</button></div></div><p class="mute" id="st">Your panel is saved when you copy the link or press Done.</p><div class="row"><button id="back">Back</button><button class="pri" id="fin">Done</button></div>`,true);
+  const commit=()=>{if(sent)return;sent=true;$('#mx').classList.add('hide');$('#back').classList.add('hide');track(submit({mode:'link',token:tok}))};
+  $('#back').onclick=home;
+  $('#copy').onclick=()=>{try{navigator.clipboard.writeText(u)}catch(e){}commit();$('#copy').textContent='Copied!'};
+  $('#fin').onclick=()=>{commit();waitThenHome($('#fin'))}}
+ home()}
 $('#done').onclick=()=>{pending=exportPng();(info.isLast||info.nextHasAccount)?sendNow():openShare()};
 (async()=>{const r=await fetch('/api/turn/'+token);if(!r.ok){$('#err').classList.remove('hide');return}
  info=await r.json();players=info.players;loops=info.loops;$('#draw').classList.remove('hide');turn();

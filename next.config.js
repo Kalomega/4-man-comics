@@ -1,4 +1,4 @@
-const fresh = ['shell.js', 'studio.js', 'home.js', 'comic.js', 'dash.js', 'studio.css'];
+const fresh = ['shell.js', 'studio.js', 'home.js', 'comic.js', 'dash.js', 'friends.js', 'studio.css'];
 module.exports = {
   async headers() {
     return fresh.map((f) => ({ source: '/' + f, headers: [{ key: 'Cache-Control', value: 'public, max-age=0, must-revalidate' }] }));
@@ -10,6 +10,7 @@ module.exports = {
       { source: '/comic/:id', destination: '/comic.html' },
       { source: '/privacy', destination: '/privacy.html' },
       { source: '/terms', destination: '/terms.html' },
+      { source: '/friends', destination: '/friends.html' },
       { source: '/dashboard', destination: '/dashboard.html' },
     ];
   },

@@ -70,6 +70,7 @@ a.gbtn,a.ybtn{text-decoration:none;display:inline-flex;align-items:center;gap:8p
 @media (max-width:700px){#topLogin{font-size:12px;padding:4px 8px}}
 .cc{margin:14px 0;padding:14px 16px}.cc h2{margin-bottom:4px}.cc .row{margin-top:8px}
 
-body.wait>*{visibility:hidden}
-body.wait::after{content:'';position:fixed;left:50%;top:50%;width:38px;height:38px;margin:-19px 0 0 -19px;border:4px solid #e4e2dc;border-top-color:var(--acc);border-radius:50%;opacity:0;animation:spin .8s linear infinite,fadein .2s .35s forwards}
 @keyframes spin{to{transform:rotate(360deg)}}@keyframes fadein{to{opacity:1}}
+
+.spin{width:38px;height:38px;border:4px solid #e4e2dc;border-top-color:var(--acc);border-radius:50%;margin:40px auto;opacity:0;animation:spin .8s linear infinite,fadein .2s .3s forwards}
+.top{min-height:54px}#navr{display:inline-flex;align-items:center;opacity:0;transition:opacity .2s}#navr.on{opacity:1}

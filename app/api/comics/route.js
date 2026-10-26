@@ -26,10 +26,19 @@ export async function POST(req) {
   return json({ comicId: comic.id, token }); // creator draws panel 1 at /play/<token>
 }
 
-// GET: comics the logged-in user created or was added to (dashboard).
+// GET: comics the logged-in user created or was added to, with live status for active ones (dashboard, one request).
 export async function GET() {
   const u = await getUser();
   if (!u) return json({ error: 'login-required' }, 401);
   const { data } = await db.from('participants').select('comics(id,title,status,players,loops,total,current_idx,creator_id,turn_started_at)').eq('user_id', u.id);
-  return json({ comics: (data || []).map((r) => ({ ...r.comics, isCreator: r.comics.creator_id === u.id })) });
+  const comics = (data || []).map((r) => r.comics).filter(Boolean);
+  const ids = comics.filter((c) => c.status === 'active').map((c) => c.id);
+  const { data: slots } = ids.length ? await db.from('slots').select('comic_id,idx,panel_path,profiles(name)').in('comic_id', ids) : { data: [] };
+  return json({ comics: comics.map((c) => {
+    const base = { ...c, isCreator: c.creator_id === u.id };
+    if (c.status !== 'active') return base;
+    const ss = (slots || []).filter((x) => x.comic_id === c.id);
+    return { ...base, panel: ss.filter((x) => x.panel_path).length + 1, loop: c.loops ? Math.floor(c.current_idx / c.players) + 1 : null,
+      loops: c.loops + 1, waitingOn: ss.find((x) => x.idx === c.current_idx)?.profiles?.name || null };
+  }) });
 }

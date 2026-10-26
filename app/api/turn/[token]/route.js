@@ -23,7 +23,7 @@ export async function GET(_req, { params }) {
 export async function POST(req, { params }) {
   const s = await findTurn((await params).token);
   if (!s) return json({ error: 'invalid-or-used' }, 404);
-  const c = s.comics, { png, mode, email } = await req.json();
+  const c = s.comics, { png, mode, email, token: clientToken } = await req.json();
   if (typeof png !== 'string' || !png.startsWith('data:image/png;base64,') || png.length > 4_000_000) return json({ error: 'bad-image' }, 400);
   const next = await nextSlot(c.id, s.idx);
   if (next && !next.user_id) {
@@ -39,7 +39,8 @@ export async function POST(req, { params }) {
   const { data: claimed } = await db.from('slots').update({ panel_path: path, token_hash: null, user_id: user?.id ?? s.user_id }).match({ comic_id: c.id, idx: s.idx }).is('panel_path', null).select();
   if (!claimed?.length) return json({ error: 'invalid-or-used' }, 409);
   if (!next) return json({ done: true, comicId: c.id, nameToken: await finishComic(c.id) });
-  const token = await openSlot(c.id, next); // emails the next player automatically if they have an account
+  const given = mode === 'link' && /^[A-Za-z0-9_-]{43}$/.test(clientToken || '') ? clientToken : undefined; // 32 random bytes, base64url, made in the browser
+  const token = await openSlot(c.id, next, given); // emails the next player automatically if they have an account
   if (next.user_id) return json({ nextHasAccount: true });
   if (mode === 'email') { await turnMail(email, turnLink(token)); return json({ sent: true }); } // address is never stored
   return json({ link: turnLink(token) });

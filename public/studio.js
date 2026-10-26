@@ -73,17 +73,26 @@ $('#home').onclick=()=>{modal(`<h2>Leave this drawing?</h2><p>Your unsent drawin
 async function submit(extra){const r=await fetch('/api/turn/'+token,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({png:pending,...extra})});return{ok:r.ok,d:await r.json().catch(()=>({}))}}
 const fail=d=>{$('#st')?($('#st').textContent=d.error==='invalid-or-used'?'This link was already used.':'Something went wrong. Please try again.'):modal('<h2>Couldn’t save</h2><p>Something went wrong. Please try again.</p>',true)};
 function login(){try{sessionStorage.setItem('draft:'+token,cv.toDataURL())}catch(e){}location='/auth/login?next='+encodeURIComponent(location.pathname)}
-function markSaved(msg){$('#mx').classList.add('hide');$('#st').textContent=msg;$('#mc').insertAdjacentHTML('beforeend','<button class="pri" id="fin" style="margin-top:10px">Done</button>');$('#fin').onclick=()=>{location='/'}}
+let inflight=null,failed=false;
+function markSaved(msg){$('#mx').classList.add('hide');$('#st').textContent=msg;$('#mc').insertAdjacentHTML('beforeend','<button class="pri" id="fin" style="margin-top:10px">Done</button>');
+ $('#fin').onclick=async()=>{const b=$('#fin');b.disabled=true;b.textContent='Finishing…';try{await inflight}catch(e){}if(!failed)location='/'}}
 async function sendNow(){const r=await submit({});if(!r.ok)return fail(r.d);const d=r.d;
  if(d.done){sessionStorage.setItem('name:'+d.comicId,d.nameToken);location='/comic/'+d.comicId;return}
  modal(`<h2>Panel sent!</h2><p>Your panel went to the next player’s account and they’ve been told it’s their turn. You’re all done.</p><button class="pri" id="fin" style="margin-top:10px">Done</button>`,false);$('#fin').onclick=()=>{location='/'}}
-function openShare(){
+function mkToken(){const b=crypto.getRandomValues(new Uint8Array(32));return btoa(String.fromCharCode(...b)).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')}
+function undoSaved(d){openShare();$('#st').textContent=d.error==='invalid-or-used'?'This turn was already submitted.':'That didn’t go through, so nothing was sent. Please try again.'}
+function track(p){failed=false;inflight=p.then(r=>{if(!r.ok){failed=true;undoSaved(r.d)}return r});return inflight}
+function openShare(){const tok=mkToken();let busy=false; // link is made now (not shown) so it can appear instantly on click
  modal(`<h2>Pass it on</h2><p class="mute">The next player isn’t added as a friend, so send them your panel to keep the comic going.</p>
  <div class="opt" style="background:#e6efff"><label style="margin-top:0">Send by email</label><div class="row"><input type="text" id="em" placeholder="friend@example.com"><button class="ybtn" id="send">Send</button></div><p class="mute" style="margin:6px 0 0">Emails are used once and never stored.</p></div>
  <div class="opt" style="background:#ffe8e0"><label style="margin-top:0">Or share a link</label><div class="row" id="lrow"><button class="ybtn" id="getlink">Create link and copy</button></div></div>
  <p class="mute" id="st"></p>${info.loggedIn?'':`<div class="lg"><span class="mute">Want the finished comic in your inbox?</span><button class="gbtn" id="g">${GI}Log in with Google</button></div>`}`,true);
- $('#send').onclick=async()=>{const e=$('#em').value.trim();if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e))return $('#st').textContent='Enter a valid email first.';const r=await submit({mode:'email',email:e});r.ok?markSaved('Sent! Your panel is saved and the next player has been emailed.'):fail(r.d)};
- $('#getlink').onclick=async()=>{const r=await submit({mode:'link'});if(!r.ok)return fail(r.d);const u=r.d.link;$('#lrow').innerHTML='<input type="text" id="lnk" readonly value="'+u+'"><button class="ybtn" id="copy">Copy link</button>';$('#copy').onclick=()=>{$('#lnk').select();try{navigator.clipboard.writeText(u)}catch(e){}};try{navigator.clipboard.writeText(u)}catch(e){}markSaved('Link created, copied, and your panel is saved. Send it to the next player.')};
+ $('#send').onclick=()=>{if(busy)return;const e=$('#em').value.trim();if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e))return $('#st').textContent='Enter a valid email first.';
+  busy=true;markSaved('Sent! The next player is being emailed.');track(submit({mode:'email',email:e}))};
+ $('#getlink').onclick=()=>{if(busy)return;busy=true;const u=location.origin+'/play/'+tok;
+  $('#lrow').innerHTML='<input type="text" id="lnk" readonly value="'+u+'"><button class="ybtn" id="copy">Copy link</button>';
+  $('#copy').onclick=()=>{$('#lnk').select();try{navigator.clipboard.writeText(u)}catch(e){}};try{navigator.clipboard.writeText(u)}catch(e){}
+  markSaved('Link created and copied. Send it to the next player.');track(submit({mode:'link',token:tok}))};
  if($('#g'))$('#g').onclick=login}
 $('#done').onclick=()=>{pending=exportPng();(info.isLast||info.nextHasAccount)?sendNow():openShare()};
 (async()=>{const r=await fetch('/api/turn/'+token);if(!r.ok){$('#err').classList.remove('hide');return}
